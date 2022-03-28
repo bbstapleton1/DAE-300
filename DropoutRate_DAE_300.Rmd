@@ -1,0 +1,351 @@
+---
+title: "Final Project"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#Packages
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+#Read data into R
+data <- read.csv("Dropout_Rate.csv")
+head(data)
+```
+
+## Assumptions of Multiple Linear Regression
+1. Linear Relationship between each predictor variable and response variable 
+2. No Multicollinearity
+3. Independence of Observations
+4. Homoscedasticity - residuals have constant variance
+5. Multivariate Normality 
+
+
+## EDA 
+```{r}
+#Summary statistics
+summary(data)
+str(data)
+table(is.na(data))
+```
+
+
+# Boxplots 
+```{r message=FALSE, warning=FALSE}
+ggplot(data, aes(y = Enrollment)) + 
+  geom_boxplot(outlier.colour="red", fill = "cyan") + 
+  labs(ylab = "Enrollment") + 
+  geom_hline(yintercept = mean(data$Enrollment), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = Cost.Pupil)) + 
+  geom_boxplot(outlier.colour="red", fill = "gold") + 
+  labs(y = "Cost Per Student") +
+  geom_hline(yintercept = mean(data$Cost.Pupil), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = AveTeach.)) + 
+  geom_boxplot(outlier.colour="red", fill = "lavender") + 
+  labs(y = "Average Teacher Salary") +
+  geom_hline(yintercept = mean(data$AveTeach.), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = SATPartRate)) + 
+  geom_boxplot(outlier.colour="red", fill = "lightblue") + 
+  labs(y = "SAT Particpation Rate") + 
+  geom_hline(yintercept = mean(data$SATPartRate), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = SATM)) + 
+  geom_boxplot(outlier.colour="red", fill = "red") + 
+  labs(y = "SAT Math") +
+  geom_hline(yintercept = mean(data$SATM), colour = "black", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = SATV)) + 
+  geom_boxplot(outlier.colour="red", fill = "lightgreen") + 
+  labs(y = "SAT Verbal") +
+  geom_hline(yintercept = mean(data$SATV), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = X10GMCASEng)) + 
+  geom_boxplot(outlier.colour="red", fill = "orange") + 
+  labs(y = "GMCAS English Score") +
+  geom_hline(yintercept = mean(data$X10GMCASEng), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = X10GMCASMth)) + 
+  geom_boxplot(outlier.colour="red", fill = "darkgreen") + 
+  labs(y = "GMCAS Math Score") +
+  geom_hline(yintercept = mean(data$X10GMCASMth), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = S.TRatio)) + 
+  geom_boxplot(outlier.colour="red", fill = "purple") + 
+  labs(y = "Student to Teacher Ratio") +
+  geom_hline(yintercept = mean(data$S.TRatio), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = S.CounselRatio)) + 
+  geom_boxplot(outlier.colour="red", fill = "maroon") + 
+  labs(y = "Student to Counseler Ratio") +
+  geom_hline(yintercept = mean(data$S.CounselRatio), colour = "red", size = 1) + 
+  theme_classic()
+####
+ggplot(data, aes(y = DropoutRate)) + 
+  geom_boxplot(outlier.colour="red", fill = "brown") + 
+  labs(y = "Dropout Rate") +
+  geom_hline(yintercept = mean(data$DropoutRate), colour = "red", size = 1) + 
+  theme_classic()
+# Some outlines for nearly every predictor - potential violation of assumption of normality of residuals 
+```
+
+
+# Correlation Plot 
+```{r message=FALSE, warning=FALSE}
+corr <- cor(data)
+corr
+#install.packages("corrplot")
+library(corrplot)
+data = data[,c(-1)]
+M= cor(data)
+corrplot(M, method = "color", order = "AOE" , type = "upper", tl.col = "black")
+# Exams are highly correlated with each other - potential violation of Multicollinearity assumptions 
+```
+# scatterplots 
+```{r message=FALSE, warning=FALSE}
+ggplot(data, aes(x = Enrollment, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "Enrollment", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = Cost.Pupil, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "Cost per Student", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = AveTeach., y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "EAverage Teacher Salary", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = SATV, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "SAT Verbal", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = SATM, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "SAT Math", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = SATPartRate, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "SAT Participation Rate", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = X10GMCASEng, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "GMCAS English", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = X10GMCASMth, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "GMCAS Math", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = S.TRatio, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "Student to Teacher Ratio", y = "Dropout Rate") + 
+  theme_classic()
+###
+ggplot(data, aes(x = S.CounselRatio, y = DropoutRate)) + 
+  geom_point() + 
+  geom_smooth(method = lm) + 
+  geom_smooth(se = FALSE, color = "red") + 
+  labs(x = "Student to Counsler Ratio", y = "Dropout Rate") + 
+  theme_classic()
+
+```
+
+# Distrabution of Response 
+```{r message=FALSE, warning=FALSE}
+ggplot(data,aes(x = DropoutRate)) + 
+  geom_density() + 
+  labs(x = "Dropout Rate", y = "") + 
+  theme_classic()
+### Calculate Skewness ###
+library(e1071)
+skewness(data$DropoutRate)
+### Convert to Log Response ###
+trans_resp <- log1p(data$DropoutRate)
+plot(density(trans_resp), main = "Log transform Response")
+### Add log Response to data frame ### 
+log_data <- data %>% 
+  mutate(DropoutRate, log_dropout = log1p(DropoutRate)) %>% 
+  select(-DropoutRate)
+```
+
+# Full Model 
+```{r message=FALSE, warning=FALSE}
+###With Outliers####
+full_model <- lm(log_dropout ~ .,
+                 data = log_data)
+
+summary(full_model)
+### Remove Outliers###
+log_data_outliers_rm <- log_data %>% 
+  filter_all(all_vars(. < mean(.) + 2*sd(.)))
+### Run model again ###
+full_model_outliers_rm <- lm(log_dropout ~ .,
+                             data = log_data_outliers_rm)
+
+summary(full_model_outliers_rm)
+```
+
+
+
+# Best Subset Selection 
+```{r message=FALSE, warning=FALSE}
+###test all possible models with 1 to k = 10 predictors###
+library("leaps")
+attach(log_data)
+regfit.full = regsubsets(log_dropout ~ .,
+                         log_data, 
+                         nvmax = 10)
+sum1 <- summary(regfit.full)
+sum1
+###plot RSS/R^2/Cp/BIC###
+par(mfrow = c(2,2))
+plot(sum1$rss, 
+     xlab = "Number of Variables", 
+     ylab = "RSS", 
+     type = "l")
+minrss <- which.min(sum1$rss)
+points(minrss,
+       sum1$rss[10],
+       col = "red",
+       cex = 2,
+       pch = 20)
+plot(sum1$adjr2, 
+     xlab = "Number of Variables", 
+     ylab = "Adj. RSq", 
+     type = "l")
+max<- which.max(sum1$adjr2)
+points(max, 
+       sum1$adjr2[4], 
+       col = "red", 
+       cex = 2, 
+       pch= 20)
+plot(sum1$cp, 
+     xlab = "Number of Variables", 
+     ylab = "Cp", 
+     type = "l")
+mincp <- which.min(sum1$cp)
+points(mincp, 
+       sum1$cp[3], 
+       col = "red", 
+       cex = 2, 
+       pch= 20)
+minBIC <- which.min(sum1$bic)
+plot(sum1$bic, 
+     xlab = "Number of Variables",
+     ylab = "BIC", 
+     type = "l")
+points(minBIC, 
+       sum1$bic[3], 
+       col = "red", 
+       cex = 2, 
+       pch= 20)
+```
+
+```{r message=FALSE, warning=FALSE}
+### Using CV to calculate test error ###
+set.seed(6)
+train = sample(c(TRUE,FALSE), nrow(log_data), rep = TRUE)
+test = (!train)
+regfit.best <- regsubsets(log_dropout~., 
+                          data = log_data[train,], 
+                          nvmax = 10)
+
+test.mat <- model.matrix(log_dropout~.,
+                         data = log_data[test,])
+val.errors <- rep(NA,10)
+### function that ...###
+for(i in 1:10){
+  coefi <- coef(regfit.best, id = i)
+  pred = test.mat[,names(coefi)] %*% coefi
+  val.errors[i] = mean((log_data$log_dropout[test]-pred)^2)
+}
+min_errors <- which.min(val.errors)
+regfit.best.full <- regsubsets(log_dropout ~ ., 
+                               data = log_data, 
+                               nvmax = 10)
+plot(val.errors, 
+     xlab = "Number of Varibles", 
+     ylab = "Error", 
+     type = "l",
+     main = "Cross validation test error")
+points(3, 
+       val.errors[3], 
+       col = "red", 
+       cex = 2, 
+       pch= 20)
+
+```
+
+
+# Final Model 
+```{r message=FALSE, warning=FALSE}
+finModel <- lm(log_dropout ~ 
+                 Enrollment + 
+                 AveTeach. +  
+                 X10GMCASEng, 
+               data = log_data)
+
+summary(finModel)
+
+```
+
+# Residual & QQ Plot
+```{r message=FALSE, warning=FALSE}
+par(mfrow = c(1,2))
+res <- resid(finModel)
+plot(fitted(finModel), res, main = "Residual plot", xlab = "Predicted log Dropout Rates", ylab = "Residuals", col = ifelse(abs(res) > 1, "red", "black"), pch = 20)
+abline(0,0)
+### QQ plot ##
+qqnorm(res, pch =20, cex =.75)
+qqline(res)
+# residuals appear to have constant variance and roughly follow normal distribution 
+```
+```{r}
+#update on my code
+#This is my second update
+```
+
