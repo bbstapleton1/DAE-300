@@ -344,9 +344,12 @@ qqnorm(res, pch =20, cex =.75)
 qqline(res)
 # residuals appear to have constant variance and roughly follow normal distribution 
 ```
+
+
 ```{r}
 #update on my code
 #This is my second update
 #This is my third updates
+#this is my final update
 ```
 
